@@ -1,1 +1,1 @@
-# front2
+se ejecuta con flutter run
