@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:un_work_out/register/register_view.dart';
 import 'package:un_work_out/login/login_view.dart';
+import 'package:un_work_out/routines/routines_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/register': (context) => RegisterPage(title: 'unworkout'),
         '/login': (context) => LoginPage(title: 'unworkout'),
+        '/routines': (context) => RoutinePage(),
       },
       theme: ThemeData(
         primarySwatch: Colors.red,

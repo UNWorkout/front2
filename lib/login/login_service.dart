@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:un_work_out/base/graphql_config.dart';
 
@@ -36,6 +37,8 @@ class GraphQLService {
       if (res == null) {
         throw Exception('Login failed');
       }
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('authToken', res['token']);
       return {
         'msg': res['msg'],
         'token': res['token'],

@@ -13,6 +13,21 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  void handleLogin() async {
+    try {
+      var response = await _graphQLService.loginUser(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      if (response.containsKey('token')) {
+        Navigator.pushNamed(context, '/routines');
+      } else {
+        debugPrint('Inicio de sesión fallido');
+      }
+    } catch (e) {
+      debugPrint('Error al iniciar sesión: $e');
+    }
+  }
 
   @override
   initState() {
@@ -48,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: "Correo electronico",
-                    hintText: "Ingrese sus nombres",
+                    hintText: "Ingrese su correo electronico gmail",
                   ),
                 ),
               ),
@@ -74,10 +89,8 @@ class _LoginPageState extends State<LoginPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD60909),
                       ),
-                      onPressed: () async {
-                        await _graphQLService.loginUser(
-                            email: _emailController.text,
-                            password: _passwordController.text);
+                      onPressed: () {
+                        handleLogin();
                       },
                     ),
                   ),

@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:un_work_out/base/graphql_config.dart';
 
@@ -94,7 +95,12 @@ class GraphQLService {
   }
 
   // Consulta de Rutina de Usuario
-  Future<Map<String, dynamic>> routineUser(String id) async {
+  Future<List> routineUser(String id) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('authToken');
+    if (token == null) {
+      throw Exception('Auth token not found');
+    }
     try {
       final result = await graphQLClient.query(
         QueryOptions(
@@ -102,58 +108,38 @@ class GraphQLService {
           document: gql(
             """
             query RoutineUser(\$id: ID!) {
-              routineUser(ID: \$id) {
-                _id
-                dias_semana {
-                  Duracion_Max
-                  Hora_inicio
-                  _id
-                  dia
-                  ejercicios
-                }
-                promedio
-                usuario_id
-              }
-            }
-            """,
-          ),
-          variables: {
-            'id': id,
-          },
-        ),
-      );
-      return result.data?['routineUser'];
-    } catch (e) {
-      throw Exception(e.toString());
-    }
-  }
-
-  // Consulta de Rutina de Usuario por Día
-  Future<Map<String, dynamic>> routineUserDay(String id, String day) async {
-    try {
-      final result = await graphQLClient.query(
-        QueryOptions(
-          fetchPolicy: FetchPolicy.noCache,
-          document: gql(
-            """
-            query RoutineUserDay(\$id: ID!, \$day: String!) {
-              routineUserDay(ID: \$id, DAY: \$day) {
+            routineUser(ID: \$id) {
+              dias_semana {
                 Duracion_Max
                 Hora_inicio
-                _id
                 dia
                 ejercicios
               }
             }
+          }
             """,
           ),
           variables: {
             'id': id,
-            'day': day,
           },
+          context: Context().withEntry(
+            HttpLinkHeaders(
+              headers: {
+                'auth': '$token',
+              },
+            ),
+          ),
         ),
       );
-      return result.data?['routineUserDay'];
+      if (result.hasException) {
+        throw Exception(result.exception.toString());
+      }
+      List? res = result.data?['routineUser']['dias_semana'];
+      if (res == null || res.isEmpty) {
+        return [];
+      }
+
+      return res;
     } catch (e) {
       throw Exception(e.toString());
     }
