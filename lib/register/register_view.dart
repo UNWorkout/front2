@@ -125,6 +125,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             cellPhone: _cellPhoneController.text,
                             email: _emailController.text,
                             password: _passwordController.text);
+                        await _graphQLService.sendMail(
+                            destinatario: _emailController.text,
+                            asunto: "Bienvenido a UnWorkOut",
+                            mensaje:
+                                "Bienbenido ${_nameController.text} ${_lastNameController.text} a UnWorkOut, esperamos que disfrutes de nuestra aplicacion");
                       },
                       child: Text("Registrar"),
                       style: ElevatedButton.styleFrom(

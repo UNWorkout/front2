@@ -82,4 +82,41 @@ class GraphQLService {
       throw Exception(e.toString());
     }
   }
+
+  Future<String> sendMail({
+    required String destinatario,
+    required String asunto,
+    required String mensaje,
+  }) async {
+    try {
+      MutationOptions options = MutationOptions(
+        fetchPolicy: FetchPolicy.noCache,
+        document: gql(
+          """
+          mutation SendMail(\$destinatario: String!, \$asunto: String!, \$mensaje: String!) {
+            sendMail(destinatario: \$destinatario, asunto: \$asunto, mensaje: \$mensaje) {
+              msg
+            }
+          }
+          """,
+        ),
+        variables: {
+          'destinatario': destinatario,
+          'asunto': asunto,
+          'mensaje': mensaje,
+        },
+      );
+      QueryResult result = await graphQLClient.mutate(options);
+      if (result.hasException) {
+        throw Exception(result.exception.toString());
+      }
+      var res = result.data?['sendMail'];
+      if (res == null) {
+        throw Exception('Failed to send mail');
+      }
+      return res['msg'];
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }
