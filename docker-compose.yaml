@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  frontend:
+    build:
+      context: .  # Esto debería apuntar al directorio donde se encuentra tu Dockerfile
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "7000:80"
